@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import heapq
 
 #Class to abstracty the packet structure
 class packet:
@@ -18,3 +19,20 @@ class poisson_process_source:
         #Exponential inter-arrival times imply Poisson distributed arrivals
         self.inter_arrival = np.random.exponential(1/self.lambd, 1)
         self.packet_size = math.ceil(np.random.exponential(10000))
+
+#Class that manages the events on the queue using heapq library fro the data structure
+class queue:
+    def __init__(self):
+        self.heap = []
+
+    def insert(self, packet):
+        heapq.heappush(self.heap, packet)
+
+    def pop(self):
+        if self.heap:
+            packet = heapq.heappop(self.heap)
+            return packet
+        return None
+
+    def is_empty(self):
+        return len(self.heap) == 0
