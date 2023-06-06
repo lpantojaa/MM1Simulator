@@ -36,3 +36,24 @@ class queue:
 
     def is_empty(self):
         return len(self.heap) == 0
+
+class server:
+    # 10 Gbits/s = 10000 bits/us
+    service_rate = 10000
+    total_packets_service_time = 0
+    time_in_system = 0
+    server_time = 0
+    packet_id = 0
+
+    def service(self, queue):
+        packet = queue.pop()
+        self.packet_id = packet.id
+        #Service time is defined by the size of a packet and the defined service rate at the server
+        service_time = packet.size / self.service_rate
+        self.total_packets_service_time += service_time
+        #Update the packet departure time
+        packet.departure_time = self.server_time + service_time
+
+        self.time_in_system = packet.departure_time - packet.arrival_time
+        #Change the time at the server
+        self.server_time = packet.departure_time
