@@ -128,9 +128,11 @@ class Simulator:
 
     def simulate(self):
         current_server = Server(self.service_rate)
-        source = PoissonProcessSource(self.packet_arrival_rate)
-        while self.total_packets < self.num_of_packets:
+        source = TraceFileSource(self.trace_file)
+        while True:
             inter_arrival, packet_size = source.generate_packet_information() 
+            if inter_arrival is None and packet_size is None:
+                break
             current_packet = Packet(self.total_packets, self.system_clock, packet_size)
 
             print("[%.4f us]: pkt %d arrives and finds %d packets in the queue" % (self.system_clock, current_packet.id, len(self.active_queue.heap)))
