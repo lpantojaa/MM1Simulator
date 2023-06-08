@@ -3,7 +3,6 @@ import math
 import heapq
 import argparse
 import matplotlib.pyplot as plt
-import csv
 
 #Class to import the file
 class TraceFileSource:
