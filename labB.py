@@ -5,7 +5,7 @@ import argparse
 import matplotlib.pyplot as plt
 import csv
 
-#Class to import the CSV file
+#Class to import the file
 class TraceFileSource:
     def __init__(self, file_name):
         self.file_name = file_name
@@ -58,11 +58,12 @@ class Queue:
         return len(self.heap) == 0
 
 class Server:
-    # 10 Gbits/s = 10000 bits/us
-    service_rate = 10000
     time_in_system = 0
     server_time = 0
     current_packet_id = 0
+    
+    def __init__(self, service_rate):
+        self.service_rate = service_rate
 
     def service(self, queue):
         packet = queue.pop()
@@ -77,7 +78,7 @@ class Server:
         self.server_time = packet.departure_time
 
 class Simulator:
-    def __init__(self, num_of_packets, packet_arrival_rate):
+    def __init__(self, trace_file, service_rate):
         self.system_clock = 0
         self.server_clock = 0
         self.active_queue = Queue()
@@ -85,8 +86,8 @@ class Simulator:
         self.total_packets = 0
         self.total_queue_lengths = 0
         self.total_time_in_system = 0
-        self.num_of_packets = num_of_packets
-        self.packet_arrival_rate = packet_arrival_rate
+        self.trace_file = trace_file
+        self.service_rate = service_rate
     
     def update_probability(self, n):
         if n <= 10:
@@ -167,20 +168,20 @@ class Simulator:
         self.summary()
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(description='Simulate a packet server system.')
-    parser.add_argument('num_of_packets', type=int, help='Number of packets')
-    parser.add_argument('packet_arrival_rate', type=float, help='Packet arrival rate (lambda)')
+    parser = argparse.ArgumentParser(description='Simulate a packet server system with a trace file and a custom service rate.')
+    parser.add_argument('trace_file', type=str, help='Path to the trace file')
+    parser.add_argument('service_rate', type=int, help='Service rate in bits/us')
 
     args = parser.parse_args()
 
-    if args.num_of_packets <= 0 or args.packet_arrival_rate <= 0:
-        raise argparse.ArgumentTypeError("Both num_of_packets and packet_arrival_rate should be greater than 0")
+    if args.service_rate <= 0:
+        raise argparse.ArgumentTypeError("service_rate should be greater than 0")
 
-    return args.num_of_packets, args.packet_arrival_rate
+    return args.trace_file, args.service_rate
 
 def main():
-    num_of_packets, packet_arrival_rate = parse_arguments()
-    simulator = Simulator(num_of_packets, packet_arrival_rate)
+    trace_file, service_rate = parse_arguments()
+    simulator = Simulator(trace_file, service_rate)
     simulator.simulate()
 
 if __name__ == "__main__":
