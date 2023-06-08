@@ -3,6 +3,32 @@ import math
 import heapq
 import argparse
 import matplotlib.pyplot as plt
+import csv
+
+#Class to import the CSV file
+class TraceFileSource:
+    def __init__(self, file_name):
+        self.file_name = file_name
+        self.packet_data = self.process_file()
+
+    def process_file(self):
+        # Open file and read data
+        with open(self.file_name, 'r') as file:
+            data = []
+            for line in file.readlines():
+                # Split each line into inter-arrival time and packet size
+                inter_arrival_time, packet_size = map(float, line.strip().split())
+                # Convert packet size from bytes to bits
+                packet_size = packet_size * 8
+                data.append((inter_arrival_time, packet_size))
+            #Make the data iterable
+            return iter(data)
+
+    def generate_packet_information(self):
+        try:
+            return next(self.packet_data)
+        except StopIteration:
+            return None, None
 
 #Class to abstract the packet structure
 class Packet:
@@ -14,16 +40,6 @@ class Packet:
     
     def __lt__(self, other):
         return self.arrival_time < other.arrival_time
-
-#Class that generates exponential inter-arrival times and lengths
-class PoissonProcessSource:
-    def __init__(self, packet_arrival_rate):
-        self.packet_arrival_rate = packet_arrival_rate
-
-    def generate_packet_information(self):
-        inter_arrival = np.random.exponential(1/self.packet_arrival_rate, 1)
-        packet_size = math.ceil(np.random.exponential(10000))
-        return inter_arrival, packet_size
 
 #Class that manages the events on the queue using heapq library fro the data structure
 class Queue:
@@ -110,7 +126,7 @@ class Simulator:
         plt.show()
 
     def simulate(self):
-        current_server = Server()
+        current_server = Server(self.service_rate)
         source = PoissonProcessSource(self.packet_arrival_rate)
         while self.total_packets < self.num_of_packets:
             inter_arrival, packet_size = source.generate_packet_information() 
