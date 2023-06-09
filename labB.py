@@ -1,5 +1,4 @@
 import numpy as np
-import math
 import heapq
 import argparse
 import matplotlib.pyplot as plt
