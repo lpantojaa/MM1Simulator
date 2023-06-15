@@ -16,9 +16,9 @@ Example: `python labA.py 10000 1.8`
 
 Part B differs from Part A by reading packet arrivals from a trace file of real Internet traffic and schedules appropriate events. The first trace file represents a traffic with an average service rate of 4Gbps and contains two columns: the first column represents the inter-arrival time in microseconds(us) and the second column represents the packet size in Bytes. The second one has an avergade service rate of 7Gbps.
 
-Usage: `python labB.py [trace_file] [service_rate]`
+Usage: `python labB.py [trace_file] `
 
-Example: `python labB.py trace1.txt 4000`
+Example: `python labB.py trace1.txt`
 
 ## Dependencies
 
@@ -37,3 +37,4 @@ You can install these dependencies using pip, a package manager for Python. If y
 ```bash
 pip install numpy
 pip install matplotlib
+```
