@@ -56,13 +56,11 @@ class Queue:
         return len(self.heap) == 0
 
 class Server:
+    service_rate = 10000
     time_in_system = 0
     server_time = 0
     current_packet_id = 0
     
-    def __init__(self, service_rate):
-        self.service_rate = service_rate
-
     def service(self, queue):
         packet = queue.pop()
         self.current_packet_id = packet.id
@@ -76,7 +74,7 @@ class Server:
         self.server_time = packet.departure_time
 
 class Simulator:
-    def __init__(self, trace_file, service_rate):
+    def __init__(self, trace_file):
         self.system_clock = 0
         self.server_clock = 0
         self.active_queue = Queue()
@@ -85,7 +83,6 @@ class Simulator:
         self.total_queue_lengths = 0
         self.total_time_in_system = 0
         self.trace_file = trace_file
-        self.service_rate = service_rate
     
     def update_probability(self, n):
         if n <= 10:
@@ -125,7 +122,7 @@ class Simulator:
         plt.show()
 
     def simulate(self):
-        current_server = Server(self.service_rate)
+        current_server = Server()
         source = TraceFileSource(self.trace_file)
         while True:
             inter_arrival, packet_size = source.generate_packet_information() 
@@ -168,20 +165,16 @@ class Simulator:
         self.summary()
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(description='Simulate a packet server system with a trace file and a custom service rate.')
+    parser = argparse.ArgumentParser(description='Simulate a packet server system with a trace file.')
     parser.add_argument('trace_file', type=str, help='Path to the trace file')
-    parser.add_argument('service_rate', type=int, help='Service rate in bits/us')
 
     args = parser.parse_args()
 
-    if args.service_rate <= 0:
-        raise argparse.ArgumentTypeError("service_rate should be greater than 0")
-
-    return args.trace_file, args.service_rate
+    return args.trace_file
 
 def main():
-    trace_file, service_rate = parse_arguments()
-    simulator = Simulator(trace_file, service_rate)
+    trace_file = parse_arguments()
+    simulator = Simulator(trace_file)
     simulator.simulate()
 
 if __name__ == "__main__":
